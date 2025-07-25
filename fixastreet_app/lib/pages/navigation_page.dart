@@ -21,7 +21,9 @@ class _HomePageState extends State<NavigationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
+        // selectedItemColor: Colors.blue,
+        // unselectedItemColor: Colors.red,
+        currentIndex: selectedIndex,
         onTap: (index) {
           setState(() {
             selectedIndex = index;

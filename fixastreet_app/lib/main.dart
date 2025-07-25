@@ -21,7 +21,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: NavigationPage(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const NavigationPage(),
+      },
+      // home: NavigationPage(),
     );
   }
 }
