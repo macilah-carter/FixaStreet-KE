@@ -39,51 +39,47 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Map<String, dynamic>> filteredIssues = [];
-  List<Map<String, dynamic>> issuesData =[]; // Global variable to hold fetched data
-  List<Map<String, dynamic>> pendingIssues= [];// Example data
-  List<Map<String, dynamic>> progressIssues= [];
-  List<Map<String, dynamic>> resolvedIssues= [];
+  List<Map<String, dynamic>> issuesData =
+      []; // Global variable to hold fetched data
+  List<Map<String, dynamic>> pendingIssues = []; // Example data
+  List<Map<String, dynamic>> progressIssues = [];
+  List<Map<String, dynamic>> resolvedIssues = [];
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-      fetchIssues().then((data) {
-        // print('Fetched issues: $data');
-        issuesData = data; // Update the global issuesData with fetched data
+    fetchIssues().then((data) {
+      setState(() {
+        issuesData = data;
         if (issuesData.isEmpty) {
           showDialog(
             context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text('No Issues Found'),
-                content: const Text('There are currently no issues reported.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
+            builder: (context) => AlertDialog(
+              title: const Text('No Issues Found'),
+              content: const Text('There are currently no issues reported.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
           );
         } else {
-          pendingIssues =
-              issuesData.where((issue) => issue['status'] == 'pending').toList();
-          progressIssues =
-              issuesData.where((issue) => issue['status'] == 'in_progress').toList();
-          resolvedIssues =
-              issuesData.where((issue) => issue['status'] == 'resolved').toList();
-          filteredIssues =
-              issuesData; // Initialize filteredIssues with fetched data
+          pendingIssues = issuesData
+              .where((issue) => issue['status'] == 'pending')
+              .toList();
+          progressIssues = issuesData
+              .where((issue) => issue['status'] == 'in_progress')
+              .toList();
+          resolvedIssues = issuesData
+              .where((issue) => issue['status'] == 'resolved')
+              .toList();
+          filteredIssues = issuesData;
         }
-        filteredIssues = issuesData;
-        // print(filteredIssues[0]['imageUrl']);
-        filterIssues(); // Apply initial filter
       });
     });
+
     searchController.addListener(() {
       filterIssues();
     });
@@ -178,11 +174,9 @@ class _HomePageState extends State<HomePage> {
                 child: GestureDetector(
                   onTap: () {
                     // Navigate to pending issues page
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => Pending(),
-                      ),
-                    );
+                    Navigator.of(
+                      context,
+                    ).push(MaterialPageRoute(builder: (context) => Pending()));
                   },
                   child: Container(
                     height: 60,
@@ -220,11 +214,9 @@ class _HomePageState extends State<HomePage> {
                 child: GestureDetector(
                   onTap: () {
                     // Navigate to in-progress issues page
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => Progress(),
-                      ),
-                    );
+                    Navigator.of(
+                      context,
+                    ).push(MaterialPageRoute(builder: (context) => Progress()));
                   },
                   child: Container(
                     height: 60,
@@ -262,11 +254,9 @@ class _HomePageState extends State<HomePage> {
                 child: GestureDetector(
                   onTap: () {
                     // Navigate to resolved issues page
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => Resolved(),
-                      ),
-                    );
+                    Navigator.of(
+                      context,
+                    ).push(MaterialPageRoute(builder: (context) => Resolved()));
                   },
                   child: Container(
                     height: 60,
@@ -302,184 +292,207 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredIssues.length, // Example count
-              itemBuilder: (context, index) {
-                final issue = filteredIssues[index];
-                final timeStamp = timeago.format(
-                  DateTime.parse(issue['createdAt'].toString()),
-                  locale: 'en_short',
-                );
-                // print(issue['imageUrl']);
-                return Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.all(8.0),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 3.0,
-                              ),
-                              child: Image.network(
-                                // "https://fixa-street-ke-api.vercel.app${issue['imageUrl']}",
-                                issue['imageUrl'] ?? 'https://via.placeholder.com/100',
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(0.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            issue['title'],
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                        ),
-
-                                        Icon(
-                                          Icons.watch_later_outlined,
-                                          size: 15,
-                                        ),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          timeStamp == 'just now'
-                                              ? 'Just now'
-                                              : '$timeStamp ago',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.blueGrey[600],
-                                          ),
-                                        ),
-                                        SizedBox(width: 8),
-
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                issue['status'].toString() ==
-                                                    'resolved'
-                                                ? Colors.green[100]
-                                                : issue['status'].toString() ==
-                                                      'in_progress'
-                                                ? Colors.blue[100]
-                                                : Colors.red[100],
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            issue['status'].toString(),
-                                            style: TextStyle(
-                                              color:
-                                                  issue['status'] == 'resolved'
-                                                  ? Colors.green
-                                                  : issue['status'] ==
-                                                        'in_progress'
-                                                  ? Colors.blue
-                                                  : Colors.red,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      issue['description'].toString(),
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                    SizedBox(height: 10),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 2.0,
-                                vertical: 8.0,
-                              ),
-                              child: Row(
+          filteredIssues.isEmpty
+              ? Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.green[600]!,
+                      ), // Show loading indicator if no issues found
+                    ),
+                  ),
+                )
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredIssues.length, // Example count
+                    itemBuilder: (context, index) {
+                      final issue = filteredIssues[index];
+                      final timeStamp = timeago.format(
+                        DateTime.parse(issue['createdAt'].toString()),
+                        locale: 'en_short',
+                      );
+                      // print(issue['imageUrl']);
+                      return Card(
+                        elevation: 2,
+                        margin: const EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            10.0,
+                            10.0,
+                            10.0,
+                            0.0,
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    size: 16,
-                                    color: Colors.red,
-                                  ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 3.0,
                                     ),
-                                    child: Text(
-                                      issue['category'].toString(),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.blueGrey[600],
+                                    child: Image.network(
+                                      // "https://fixa-street-ke-api.vercel.app${issue['imageUrl']}",
+                                      issue['imageUrl'] ??
+                                          'https://via.placeholder.com/100',
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(0.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  issue['title'],
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black87,
+                                                  ),
+                                                ),
+                                              ),
+
+                                              Icon(
+                                                Icons.watch_later_outlined,
+                                                size: 15,
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                timeStamp == 'just now'
+                                                    ? 'Just now'
+                                                    : '$timeStamp ago',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.blueGrey[600],
+                                                ),
+                                              ),
+                                              SizedBox(width: 8),
+
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      issue['status']
+                                                              .toString() ==
+                                                          'resolved'
+                                                      ? Colors.green[100]
+                                                      : issue['status']
+                                                                .toString() ==
+                                                            'in_progress'
+                                                      ? Colors.blue[100]
+                                                      : Colors.red[100],
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                                child: Text(
+                                                  issue['status'].toString(),
+                                                  style: TextStyle(
+                                                    color:
+                                                        issue['status'] ==
+                                                            'resolved'
+                                                        ? Colors.green
+                                                        : issue['status'] ==
+                                                              'in_progress'
+                                                        ? Colors.blue
+                                                        : Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(
+                                            issue['description'].toString(),
+                                            style: TextStyle(fontSize: 14),
+                                          ),
+                                          SizedBox(height: 10),
+                                        ],
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Expanded(
-                              child: Row(
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.location_on,
-                                    size: 15,
-                                    color: Colors.green[600],
-                                  ),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    issue['location'].toString(),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.blueGrey[600],
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 2.0,
+                                      vertical: 8.0,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.error_outline,
+                                          size: 16,
+                                          color: Colors.red,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 3.0,
+                                          ),
+                                          child: Text(
+                                            issue['category'].toString(),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.blueGrey[600],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(width: 8),
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          size: 15,
+                                          color: Colors.green[600],
+                                        ),
+                                        SizedBox(width: 3),
+                                        Expanded(
+                                          child: Text(
+                                            issue['location'].toString(),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.blueGrey[600],
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
+                ),
         ],
       ),
     );

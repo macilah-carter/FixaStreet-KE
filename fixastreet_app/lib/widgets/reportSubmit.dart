@@ -22,18 +22,18 @@ Future<void> submitReport(
 ) async {
   if (selectedCategory == 'Select Category') {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a category')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a category')));
     }
     return;
   }
 
   if (titleController.text.isEmpty) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a title')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter a title')));
     }
     return;
   }
@@ -57,10 +57,7 @@ Future<void> submitReport(
   // }
 
   try {
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(apiUrl),
-    );
+    var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
 
     request.fields['category'] = selectedCategory ?? '';
     request.fields['title'] = titleController.text;
@@ -114,16 +111,20 @@ Future<void> submitReport(
         // Wait for the SnackBar to be visible, then navigate
         await Future.delayed(const Duration(seconds: 2));
         if (context.mounted) {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) {
-              return NavigationPage(); // Navigate to the main page
-            },)); // Close the report submission dialog
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) {
+                return NavigationPage(); // Navigate to the main page
+              },
+            ),
+          ); // Close the report submission dialog
         }
-        
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to submit report. Status: ${response.statusCode}'),
+            content: Text(
+              'Failed to submit report. Status: ${response.statusCode}',
+            ),
             backgroundColor: Colors.red,
           ),
         );
