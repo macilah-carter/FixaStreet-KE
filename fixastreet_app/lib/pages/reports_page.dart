@@ -179,7 +179,7 @@ class _ReportsPageState extends State<ReportsPage> {
                   Expanded(
                     child: TextField(
                       controller: locationController,
-                      readOnly: true,
+                      // readOnly: true,
 
                       decoration: InputDecoration(
                         hintStyle: TextStyle(
