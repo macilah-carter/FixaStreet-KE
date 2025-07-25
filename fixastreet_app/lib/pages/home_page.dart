@@ -1,6 +1,9 @@
 // import 'package:fixastreet_app/utils/data.dart';
 import 'dart:convert';
 
+import 'package:fixastreet_app/widgets/pending.dart';
+import 'package:fixastreet_app/widgets/progess.dart';
+import 'package:fixastreet_app/widgets/resolved.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:timeago/timeago.dart' as timeago;
@@ -14,27 +17,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
-  final String apiUrl = 'http://localhost:8000/api/reports'; 
+  final String apiUrl = 'https://fixa-street-ke-api.vercel.app/api/reports';
   // Replace with your actual API URL
-  Future <List<Map<String, dynamic>>> fetchIssues() async {
+  Future<List<Map<String, dynamic>>> fetchIssues() async {
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
-       final List<dynamic> jsonData = jsonDecode(response.body);
-        
-         // Replace with actual parsing logic
-        return jsonData.map((item) => item as Map<String, dynamic>).toList(); // Replace with actual parsing logic
+        final List<dynamic> jsonData = jsonDecode(response.body);
+
+        // Replace with actual parsing logic
+        return jsonData
+            .map((item) => item as Map<String, dynamic>)
+            .toList(); // Replace with actual parsing logic
       } else {
         throw Exception('Failed to load issues');
       }
     } catch (e) {
-      print('Error fetching issues: $e');
+      // print('Error fetching issues: $e');
       return [];
     }
   }
 
   List<Map<String, dynamic>> filteredIssues = [];
-  List<Map<String, dynamic>> issuesData = []; // Global variable to hold fetched data
+  List<Map<String, dynamic>> issuesData =[]; // Global variable to hold fetched data
+  List<Map<String, dynamic>> pendingIssues= [];// Example data
+  List<Map<String, dynamic>> progressIssues= [];
+  List<Map<String, dynamic>> resolvedIssues= [];
 
   @override
   void initState() {
@@ -59,12 +67,20 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               );
-            },);
+            },
+          );
         } else {
-          filteredIssues = issuesData; // Initialize filteredIssues with fetched data
+          pendingIssues =
+              issuesData.where((issue) => issue['status'] == 'pending').toList();
+          progressIssues =
+              issuesData.where((issue) => issue['status'] == 'in_progress').toList();
+          resolvedIssues =
+              issuesData.where((issue) => issue['status'] == 'resolved').toList();
+          filteredIssues =
+              issuesData; // Initialize filteredIssues with fetched data
         }
-        filteredIssues = issuesData; 
-        // print(filteredIssues);
+        filteredIssues = issuesData;
+        // print(filteredIssues[0]['imageUrl']);
         filterIssues(); // Apply initial filter
       });
     });
@@ -159,98 +175,128 @@ class _HomePageState extends State<HomePage> {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 60,
-                  margin: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Text(
-                          '12',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.deepOrange[800],
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to pending issues page
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => Pending(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 60,
+                    margin: const EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Text(
+                            pendingIssues.length.toString(),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepOrange[800],
+                            ),
                           ),
                         ),
-                      ),
-                      Text(
-                        'Pending',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.blueGrey[800],
+                        Text(
+                          'Pending',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.blueGrey[800],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
               Expanded(
-                child: Container(
-                  height: 60,
-                  margin: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Text(
-                          '8',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to in-progress issues page
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => Progress(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 60,
+                    margin: const EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Text(
+                            progressIssues.length.toString(),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
                           ),
                         ),
-                      ),
-                      Text(
-                        'In Progress',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.blueGrey[800],
+                        Text(
+                          'In Progress',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.blueGrey[800],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
               Expanded(
-                child: Container(
-                  height: 60,
-                  margin: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Text(
-                          '9',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green[600],
+                child: GestureDetector(
+                  onTap: () {
+                    // Navigate to resolved issues page
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => Resolved(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 60,
+                    margin: const EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Text(
+                            resolvedIssues.length.toString(),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[600],
+                            ),
                           ),
                         ),
-                      ),
-                      Text(
-                        'Resolved',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.blueGrey[800],
+                        Text(
+                          'Resolved',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.blueGrey[800],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -266,7 +312,7 @@ class _HomePageState extends State<HomePage> {
                   DateTime.parse(issue['createdAt'].toString()),
                   locale: 'en_short',
                 );
-                // print(issue);
+                // print(issue['imageUrl']);
                 return Card(
                   elevation: 2,
                   margin: const EdgeInsets.all(8.0),
@@ -283,7 +329,8 @@ class _HomePageState extends State<HomePage> {
                                 horizontal: 3.0,
                               ),
                               child: Image.network(
-                                "https://images.unsplash.com/photo-1751971725935-84dd6f5e3544?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                                // "https://fixa-street-ke-api.vercel.app${issue['imageUrl']}",
+                                issue['imageUrl'] ?? 'https://via.placeholder.com/100',
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
@@ -298,7 +345,7 @@ class _HomePageState extends State<HomePage> {
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
-                                      
+
                                       children: [
                                         Expanded(
                                           child: Text(
@@ -310,13 +357,31 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
 
+                                        Icon(
+                                          Icons.watch_later_outlined,
+                                          size: 15,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          timeStamp == 'just now'
+                                              ? 'Just now'
+                                              : '$timeStamp ago',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.blueGrey[600],
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+
                                         Container(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 8,
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: issue['status'].toString() == 'resolved'
+                                            color:
+                                                issue['status'].toString() ==
+                                                    'resolved'
                                                 ? Colors.green[100]
                                                 : issue['status'].toString() ==
                                                       'in_progress'
@@ -360,7 +425,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
+                                horizontal: 2.0,
                                 vertical: 8.0,
                               ),
                               child: Row(
@@ -385,32 +450,26 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                             ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on,
-                                  size: 15,
-                                  color: Colors.green[600],
-                                ),
-                                SizedBox(width: 3),
-                                Text(
-                                  issue['location'].toString(),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.blueGrey[600],
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on,
+                                    size: 15,
+                                    color: Colors.green[600],
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                Icon(Icons.watch_later_outlined, size: 15),
-                                SizedBox(width: 4),
-                                Text(
-                                  "$timeStamp ago",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.blueGrey[600],
+                                  SizedBox(width: 3),
+                                  Text(
+                                    issue['location'].toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.blueGrey[600],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: 8),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -418,7 +477,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 );
-                
               },
             ),
           ),

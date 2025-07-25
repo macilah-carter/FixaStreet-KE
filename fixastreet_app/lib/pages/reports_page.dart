@@ -20,7 +20,7 @@ class _ReportsPageState extends State<ReportsPage> {
 
   File? selectedImage;
   String? imagePath;
-  String apiUrl = 'http://localhost:8000/api/reports'; // Replace with your API URL
+  String apiUrl = 'https://fixa-street-ke-api.vercel.app/api/reports'; // Replace with your API URL
   bool isSubmitting = false;
 
   @override
