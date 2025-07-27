@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import GoogleMaps
+import Dotenv
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -8,7 +9,11 @@ import GoogleMaps
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GMSServices.provideAPIKey("AIzaSyCy1HUoprYzHv4a8t0EbDLkM_klQhiONXo")
+    if let googleKey = Dotenv().load()["GOOGLE_KEY"] {
+        GMSServices.provideAPIKey(googleKey)
+    } else {
+        fatalError("Google API key not found in .env file")
+    }
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

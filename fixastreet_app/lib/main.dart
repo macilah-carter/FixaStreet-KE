@@ -1,7 +1,11 @@
 import 'package:fixastreet_app/pages/navigation_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  // Load environment variables from .env file
+  await dotenv.load(fileName: ".env");
+
   runApp(const MyApp());
 }
 
@@ -22,11 +26,8 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
-      routes: {
-        '/': (context) => const NavigationPage(),
-      },
+      routes: {'/': (context) => const NavigationPage()},
       // home: NavigationPage(),
     );
   }
 }
-
